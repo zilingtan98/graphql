@@ -20,6 +20,8 @@ const (
 type Service interface {
 	SaveNewNote(ctx context.Context, newNoteInput model.NewNoteInput) (*model.Note, error)
 	GetAllNotes(ctx context.Context) ([]*model.Note, error)
+	SaveNewUser(ctx context.Context, newUserInput model.NewUserInput) (*model.User, error)
+	GetAllUser(ctx context.Context) ([]*model.User, error)
 }
 
 type databaseBackedService struct {
@@ -45,6 +47,26 @@ func (d databaseBackedService) SaveNewNote(ctx context.Context, newNoteInput mod
 	return noteToSave, nil
 }
 
+
+func (d databaseBackedService) SaveNewUser(ctx context.Context, newUserInput model.NewUserInput) (*model.User, error) {
+	// TODO implement me
+	userToSave := newUserFromRequest(newUserInput)
+	// save this and return
+	err := d.transactionManager.WithinTransaction(ctx, func(txnContext context.Context) error {
+		savedUser, err := d.notesRepository.CreateNewUser(txnContext, userToSave)
+		if err != nil {
+			return err
+		}
+		log.Debug().Msgf("Saved user with id %s ", savedUser.ID)
+		return nil
+	})
+	if err != nil {
+		return nil, apperrors.NewInternalErrorWithUnderlying(errorUnknownWhileSavingNewNote, err)
+	}
+	return userToSave, nil
+}
+
+
 func (d databaseBackedService) GetAllNotes(ctx context.Context) ([]*model.Note, error) {
 	notes, err := d.notesRepository.GetAllNotes(ctx)
 	if err != nil {
@@ -54,13 +76,30 @@ func (d databaseBackedService) GetAllNotes(ctx context.Context) ([]*model.Note, 
 	return notes, nil
 }
 
-// region helper methods
 
+func (d databaseBackedService) GetAllUser(ctx context.Context) ([]*model.User, error) {
+	user, err := d.notesRepository.GetAllUser(ctx)
+	if err != nil {
+		log.Error().Err(err)
+		return nil, apperrors.NewInternalErrorWithUnderlying(errorFetchingAllNotes, err)
+	}
+	return user, nil
+}
+
+// region helper methods
 func newNoteFromRequest(req model.NewNoteInput) *model.Note {
 	return &model.Note{
 		ID:      shortuuid.New(),
 		Title:   req.Title,
 		Content: req.Content,
+	}
+}
+
+func newUserFromRequest(req model.NewUserInput) *model.User {
+	return &model.User{
+		ID:     shortuuid.New(),
+		Username:   req.Username,
+		Email: req.Email,
 	}
 }
 

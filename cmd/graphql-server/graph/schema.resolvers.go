@@ -11,6 +11,11 @@ import (
 	"github.com/shanmukhsista/go-graphql-starter/pkg/model"
 )
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, user model.NewUserInput) (*model.User, error) {
+	return r.notesService.SaveNewUser(ctx, user)
+}
+
 // CreateNewNote is the resolver for the createNewNote field.
 func (r *mutationResolver) CreateNewNote(ctx context.Context, input model.NewNoteInput) (*model.Note, error) {
 	return r.notesService.SaveNewNote(ctx, input)
@@ -24,6 +29,11 @@ func (r *mutationResolver) DeleteNote(ctx context.Context, id string) (string, e
 // Notes is the resolver for the notes field.
 func (r *queryResolver) Notes(ctx context.Context) ([]*model.Note, error) {
 	return r.notesService.GetAllNotes(ctx)
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	return r.notesService.GetAllUser(ctx)
 }
 
 // Mutation returns generated.MutationResolver implementation.

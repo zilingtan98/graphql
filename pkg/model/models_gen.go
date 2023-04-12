@@ -7,8 +7,19 @@ type NewNoteInput struct {
 	Content *string `json:"content"`
 }
 
+type NewUserInput struct {
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
+}
+
 type Note struct {
 	ID      string  `json:"id"`
 	Title   string  `json:"title"`
 	Content *string `json:"content"`
+}
+
+type User struct {
+	ID       string  `json:"id"`
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
 }

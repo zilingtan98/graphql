@@ -13,11 +13,24 @@ input NewNoteInput{
   content: String
 }
 
+type User {
+  id: ID!
+  username : String
+  email: String
+}
+
+input NewUserInput{
+  username : String
+  email: String
+}
+
 type Query {
   notes: [Note!]!
+  users: [User!]!
 }
 
 type Mutation {
+  createUser(user: NewUserInput!): User!
   createNewNote(input: NewNoteInput!): Note!
   # Deletes a note with id and returns the deleted note id.
   deleteNote(id : ID!) : ID!
